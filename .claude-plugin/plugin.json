@@ -3,8 +3,7 @@
   "description": "Bash and shell safety guards for Claude: blocks rm -rf, /tmp usage, cat/echo file writes, cd outside repo, and unsafe gradle commands",
   "version": "1.0.0",
   "author": {
-    "name": "MechanicalTyler",
-    "email": ""
+    "name": "MechanicalTyler"
   },
   "license": "MIT",
   "keywords": ["guardrails", "safety", "bash", "shell", "hooks", "rm", "filesystem"]
