@@ -1,6 +1,6 @@
 {
   "name": "guardrails-bash",
-  "description": "Bash and shell safety guards for Claude: blocks rm -rf, /tmp usage, cat/echo file writes, cd outside repo, and unsafe gradle commands",
+  "description": "Bash and shell safety guards for Claude: blocks rm -rf, /tmp usage, cd outside repo, and unsafe gradle commands",
   "version": "1.0.1",
   "author": {
     "name": "MechanicalTyler"
