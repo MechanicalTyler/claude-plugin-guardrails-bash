@@ -86,35 +86,6 @@ def block_tmp_directory_usage(tool_name, tool_input):
                 sys.exit(1)
 
 
-def block_cat_echo_file_write(tool_name, tool_input):
-    if tool_name != 'Bash':
-        return
-    command = tool_input.get('command', '')
-    if not command:
-        return
-
-    cat_redirect_patterns = [
-        r'cat\s+<<.*?>\s*\S+',
-        r'cat\s+>+\s*\S+',
-    ]
-    for pattern in cat_redirect_patterns:
-        if re.search(pattern, command):
-            decision = {
-                "decision": "block",
-                "reason": "Do not use cat or echo to write files. Use the Write tool instead for creating/editing files."
-            }
-            print(json.dumps(decision))
-            sys.exit(1)
-
-    if re.search(r'echo\s+.*>\s*\S+', command):
-        decision = {
-            "decision": "block",
-            "reason": "Do not use cat or echo to write files. Use the Write tool instead for creating/editing files."
-        }
-        print(json.dumps(decision))
-        sys.exit(1)
-
-
 def block_cd_outside_repo(tool_name, tool_input):
     if tool_name != 'Bash':
         return
@@ -226,7 +197,6 @@ def main():
 
         block_rm_rf_command(tool_name, tool_input)
         block_tmp_directory_usage(tool_name, tool_input)
-        block_cat_echo_file_write(tool_name, tool_input)
         block_cd_outside_repo(tool_name, tool_input)
         block_gradle_build_command(tool_name, tool_input)
         add_timeout_to_gradle_test(tool_name, tool_input)
