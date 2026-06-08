@@ -1,6 +1,6 @@
 {
   "name": "guardrails-bash",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Bash and shell safety guards for Claude: blocks rm -rf, /tmp usage, cd outside repo, and unsafe gradle commands",
   "license": "MIT",
   "hooks": {
