@@ -6,8 +6,6 @@
 import json
 import sys
 import re
-import os
-import subprocess
 
 
 def create_timeout_error_message(command_type, wanted_timeout, current_timeout):
@@ -86,71 +84,6 @@ def block_tmp_directory_usage(tool_name, tool_input):
                 sys.exit(1)
 
 
-def block_cd_outside_repo(tool_name, tool_input):
-    if tool_name != 'Bash':
-        return
-    command = tool_input.get('command', '')
-    if not command:
-        return
-
-    cd_match = re.search(r'\bcd\s+(?P<target>\S+)?', command)
-    if not cd_match:
-        return
-
-    target = cd_match.group('target')
-
-    if not target:
-        decision = {
-            "decision": "block",
-            "reason": "You cannot cd outside the repository directory. The cd command with no arguments goes to your home directory, which is not allowed."
-        }
-        print(json.dumps(decision))
-        sys.exit(1)
-
-    if target == '~' or target.startswith('~/'):
-        decision = {
-            "decision": "block",
-            "reason": "You cannot cd outside the repository directory. The cd ~ command goes to your home directory, which is not allowed."
-        }
-        print(json.dumps(decision))
-        sys.exit(1)
-
-    if target == '-':
-        decision = {
-            "decision": "block",
-            "reason": "cd - is not allowed because the destination cannot be validated. If you absolutely need this, ask the user for permission."
-        }
-        print(json.dumps(decision))
-        sys.exit(1)
-
-    try:
-        result = subprocess.run(
-            ['git', 'rev-parse', '--show-toplevel'],
-            capture_output=True, text=True, timeout=5
-        )
-        if result.returncode != 0:
-            return
-
-        repo_root = result.stdout.strip()
-
-        if not os.path.isabs(target):
-            cwd = os.getcwd()
-            resolved_target = os.path.abspath(os.path.join(cwd, target))
-        else:
-            resolved_target = os.path.abspath(target)
-
-        if not resolved_target.startswith(repo_root):
-            decision = {
-                "decision": "block",
-                "reason": f"You cannot cd outside the repository directory. Stay within the repo: {repo_root}"
-            }
-            print(json.dumps(decision))
-            sys.exit(1)
-
-    except (subprocess.TimeoutExpired, subprocess.SubprocessError, FileNotFoundError):
-        pass
-
-
 def add_timeout_to_gradle_test(tool_name, tool_input):
     if tool_name == 'Bash':
         command = tool_input.get('command', '')
@@ -197,7 +130,6 @@ def main():
 
         block_rm_rf_command(tool_name, tool_input)
         block_tmp_directory_usage(tool_name, tool_input)
-        block_cd_outside_repo(tool_name, tool_input)
         block_gradle_build_command(tool_name, tool_input)
         add_timeout_to_gradle_test(tool_name, tool_input)
 
